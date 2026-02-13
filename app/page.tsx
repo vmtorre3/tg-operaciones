@@ -42,7 +42,7 @@ export default function Page() {
 
   async function enviarEvento(tipo_evento: EventoCode) {
     if (!ordenValida) {
-      showToast("err", "Escribe un ID_Orden válido (ej. 8098 o ORD-000123)");
+      showToast("err", "Escribe un ID_Orden válido (ej. 8098)");
       return;
     }
     if (!operadorValido) {
@@ -67,9 +67,7 @@ export default function Page() {
       let json: any = null;
       try {
         json = JSON.parse(text);
-      } catch {
-        // Si no es JSON, igual seguimos con el status HTTP
-      }
+      } catch {}
 
       if (!res.ok) {
         showToast("err", `Error API (${res.status})`);
@@ -110,3 +108,96 @@ export default function Page() {
           </div>
         </div>
       </header>
+
+      {/* Main */}
+      <main className="mx-auto max-w-3xl px-4 py-6">
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 shadow-sm">
+          {/* Inputs */}
+          <div className="grid gap-3 md:grid-cols-3">
+            <label className="grid gap-1">
+              <span className="text-xs text-neutral-400">ID_Orden</span>
+              <input
+                value={idOrden}
+                onChange={(e) => setIdOrden(e.target.value)}
+                placeholder="8098"
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-neutral-600"
+              />
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-xs text-neutral-400">ID_Operador</span>
+              <input
+                value={idOperador}
+                onChange={(e) => setIdOperador(e.target.value)}
+                placeholder="OPR-0001"
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-neutral-600"
+              />
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-xs text-neutral-400">Nota (opcional)</span>
+              <input
+                value={nota}
+                onChange={(e) => setNota(e.target.value)}
+                placeholder="Ej. fila larga / acceso 2"
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-neutral-600"
+              />
+            </label>
+          </div>
+
+          {/* Botones */}
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
+            {EVENTOS.map((ev) => (
+              <button
+                key={ev.code}
+                onClick={() => enviarEvento(ev.code)}
+                disabled={loading !== null}
+                className={cx(
+                  "group flex items-start justify-between gap-3 rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-left transition",
+                  "hover:border-neutral-600 hover:bg-neutral-950/60",
+                  loading !== null && "opacity-70"
+                )}
+              >
+                <div>
+                  <div className="text-sm font-semibold">{ev.label}</div>
+                  <div className="mt-0.5 text-xs text-neutral-400">{ev.hint}</div>
+                </div>
+                <div className="text-xs text-neutral-500">{loading === ev.code ? "Enviando…" : "→"}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Checklist */}
+          <div className="mt-4 rounded-xl border border-neutral-800 bg-neutral-950/40 p-3 text-xs text-neutral-400">
+            <div className="font-semibold text-neutral-300">Checklist rápido</div>
+            <ul className="mt-1 list-disc space-y-1 pl-5">
+              <li>Esta web manda eventos a <span className="text-neutral-200">/api/event</span> (proxy en Vercel).</li>
+              <li>En Sheets debe existir <span className="text-neutral-200">Eventos_Orden</span> y <span className="text-neutral-200">Ordenes</span>.</li>
+              <li><span className="text-neutral-200">estatus_actual</span> está en columna O.</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-4 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2">
+          <div
+            className={cx(
+              "rounded-2xl border px-4 py-3 text-sm shadow-lg",
+              toast.type === "ok"
+                ? "border-emerald-700/60 bg-emerald-950 text-emerald-200"
+                : "border-rose-700/60 bg-rose-950 text-rose-200"
+            )}
+          >
+            {toast.msg}
+          </div>
+        </div>
+      )}
+
+      <footer className="mx-auto max-w-3xl px-4 pb-10 text-center text-xs text-neutral-500">
+        TG • Operaciones
+      </footer>
+    </div>
+  );
+}
