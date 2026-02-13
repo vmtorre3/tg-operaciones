@@ -25,7 +25,16 @@ function cx(...classes: Array<string | false | undefined | null>) {
 }
 
 export default function Page() {
-  const APPS_SCRIPT_URL = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || ''
+  const APPS_SCRIPT_URL = process.env.const res = await fetch("/api/event", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    id_orden: idOrden.trim(),
+    tipo_evento: tipoEvento,
+    id_operador: idOperador.trim(),
+    nota: nota.trim(),
+  }),
+}); || ''
 
   const [idOrden, setIdOrden] = useState('')
   const [idOperador, setIdOperador] = useState('OPR-0001')

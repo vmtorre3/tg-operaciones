@@ -1,0 +1,35 @@
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  try {
+    const url = process.env.APPS_SCRIPT_URL;
+    if (!url) {
+      return NextResponse.json(
+        { status: "err", message: "Falta APPS_SCRIPT_URL" },
+        { status: 500 }
+      );
+    }
+
+    const body = await req.json();
+
+    // Apps Script acepta mejor text/plain (evita preflight raro)
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(body),
+    });
+
+    const text = await res.text();
+
+    // regresamos lo que responda Apps Script
+    return new NextResponse(text, {
+      status: res.status,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (e: any) {
+    return NextResponse.json(
+      { status: "err", message: e?.message || "Failed to fetch (server)" },
+      { status: 500 }
+    );
+  }
+}
