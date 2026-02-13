@@ -1,46 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
-    const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
+    const body = await req.json()
 
-    if (!APPS_SCRIPT_URL) {
-      return NextResponse.json(
-        { status: "err", message: "Falta configurar APPS_SCRIPT_URL en Vercel (.env)" },
-        { status: 500 }
-      );
-    }
+    console.log('Evento recibido:', body)
 
-    const body = await req.json();
-
-    // Reenviamos a Apps Script
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    const text = await res.text();
-
-    // Apps Script a veces regresa texto plano
-    try {
-      const json = JSON.parse(text);
-      return NextResponse.json(json, { status: res.status });
-    } catch {
-      return new NextResponse(text, { status: res.status, headers: { "Content-Type": "text/plain" } });
-    }
-  } catch (e: any) {
+    return NextResponse.json({
+      status: 'ok',
+      message: 'Evento recibido correctamente'
+    })
+  } catch (error) {
     return NextResponse.json(
-      { status: "err", message: e?.message || "Error interno" },
+      { status: 'error', message: 'Error procesando request' },
       { status: 500 }
-    );
+    )
   }
-}
-
-// Opcional: para que al abrir /api/event en el navegador no marque error feo
-export async function GET() {
-  return NextResponse.json(
-    { status: "ok", message: "Use POST" },
-    { status: 200 }
-  );
 }
